@@ -1,5 +1,28 @@
 **Guest Addition,**
 
+`[anup@localhost ~]$ sudo mount /dev/cdrom /mnt`
+
+`[anup@localhost ~]$ ls -ltr /mnt`
+
+`[anup@localhost ~]$ sudo /mnt/VBoxLinuxAdditions.run`
+
+`[anup@localhost ~]$ sudo /sbin/rcvboxadd quicksetup all`
+
+`[anup@localhost ~]$ VBoxClient --version`
+
+`[anup@localhost ~]$ sudo umount /mnt`
+
+`[anup@localhost ~]$ sudo reboot now`
+
+`[anup@localhost ~]$ lsmod | grep vbox`
+
+`[anup@localhost ~]$ lsmod | grep vboxguest`
+
+`[anup@localhost ~]$ VBoxClient --version`
+
+`[anup@localhost ~]$ tail /var/log/vboxadd-setup.log`
+
+
 **Mount the VirtualBox Guest Additions ISO:** mount /dev/cdrom /mnt
 
 `[root@rhel-92-04-vagrantbox ~]# mount /dev/cdrom /mnt`
@@ -13,6 +36,7 @@
 `[root@rhel-92-04-vagrantbox ~]# /sbin/rcvboxadd quicksetup all`
 
 `[root@rhel-92-04-vagrantbox ~]# VBoxClient --version`
+
 
 <br>
 
