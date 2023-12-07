@@ -1,0 +1,40 @@
+# Global configurations are here,
+Vagrant.configure("2") do |config|
+
+  machines = ["workerdev", "workerquality"]
+
+  machines.each_with_index do |machine, index|
+    config.vm.define machine do |vm|
+      vm.vm.box = "almalinux/9"
+      vm.vm.hostname = machine
+      vm.vm.network "forwarded_port", guest: 22, host: 2222 + index, id: "ssh"
+      vm.vm.network "private_network", type: "static", ip: "192.168.56.#{index + 4}"
+      vm.vm.provider "virtualbox" do |vb|
+        vb.name = machine
+        vb.memory = 4096
+        vb.cpus = 2
+      end
+
+      vm.vm.provision "shell", inline: <<-SHELL
+        # Your provisioning script here
+      SHELL
+    end
+  end
+
+  # Controller Machine (Server 1, controllerinfra, 192.168.56.4) configurations are here,
+  config.vm.define "controllerinfra" do |controllerinfra|
+    controllerinfra.vm.box = "almalinux/9"
+    controllerinfra.vm.hostname = "controllerinfra"
+    controllerinfra.vm.network "forwarded_port", guest: 22, host: 2230, id: "ssh"
+    controllerinfra.vm.network "private_network", type: "static", ip: "192.168.56.4"
+    controllerinfra.vm.provider "virtualbox" do |vb|
+      vb.name = "controllerinfra"
+      vb.memory = 8192
+      vb.cpus = 2
+    end
+
+    controllerinfra.vm.provision "shell", inline: <<-SHELL
+      # Your provisioning script here
+    SHELL
+  end
+end

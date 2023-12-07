@@ -1,0 +1,454 @@
+# Global configurations are here,
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "rhel-92-vagrantbox"
+
+  config.ssh.username = "root"
+  config.ssh.password = " "
+  config.ssh.insert_key = false
+  config.ssh.forward_agent = true
+
+  # config.vm.provider "virtualbox" do |vb|
+  #   vb.memory = 4096
+  #   vb.cpus = 2
+  # end
+  #
+  #
+  #
+  #
+  #
+  # Worker Developement Machine (Server 2, workerdev, 192.168.56.5) configurations are here,
+  config.vm.define "workerdev" do |workerdev|
+    workerdev.vm.hostname = "workerdev"
+    workerdev.vm.network "private_network", type: "static", ip: "192.168.56.5"
+    # workerdev.vm.network "public_network", ip: "192.168.56.5", :name => 'enp0s8', :adapter => 2
+    workerdev.vm.provider "virtualbox" do |vb|
+      vb.name = "workerdev"
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+
+    workerdev.vm.provision "shell", inline: <<-SHELL
+      # Register
+      subscription-manager unregister
+      subscription-manager refresh 
+      subscription-manager clean
+      subscription-manager register --username user --password P@$$w0rd
+      subscription-manager status
+      insights-client --version
+      insights-client --register
+      rhc connect
+
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+
+      setenforce 0
+
+      # Install required softwares
+      subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      dnf install -y epel-release
+
+      yum clean all -y
+      yum check -y
+      yum check-update -y
+      yum update -y
+
+      dnf install htop -y
+      dnf install multitail -y 
+      dnf groupinstall "Development Tools" -y
+      yum install -y yum-utils
+
+      # Manage DNS
+      echo "192.168.56.4	controllerinfra" | sudo tee -a /etc/hosts
+      echo "192.168.56.5	workerdev" | sudo tee -a /etc/hosts
+      echo "192.168.56.6	workerquality" | sudo tee -a /etc/hosts
+      echo "192.168.56.7	workerartifact" | sudo tee -a /etc/hosts
+      echo "192.168.56.8	workerdeploy" | sudo tee -a /etc/hosts
+      echo "192.168.56.9	workermonitor" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers 
+
+    SHELL
+  end
+  #
+  #
+  #
+  #
+  #
+  # Worker Quality Machine (Server 3, workerquality, 192.168.56.6) configurations are here,
+  config.vm.define "workerquality" do |workerquality|
+    workerquality.vm.hostname = "workerquality"
+    workerquality.vm.network "private_network", type: "static", ip: "192.168.56.6"
+    # workerquality.vm.network "public_network", ip: "192.168.56.6", :name => 'enp0s8', :adapter => 2
+    workerquality.vm.provider "virtualbox" do |vb|
+      vb.name = "workerquality"
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+
+    workerquality.vm.provision "shell", inline: <<-SHELL
+      # Register
+      subscription-manager unregister
+      subscription-manager refresh
+      subscription-manager clean
+      subscription-manager register --username user --password P@$$w0rd
+      subscription-manager status
+      insights-client --version
+      insights-client --register
+      rhc connect
+
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+
+      setenforce 0
+
+      # Install required softwares
+      subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      dnf install -y epel-release
+
+      yum clean all -y
+      yum check -y
+      yum check-update -y
+      yum update -y
+
+      dnf install htop -y
+      dnf install multitail -y 
+      dnf groupinstall "Development Tools" -y
+      yum install -y yum-utils
+
+      # Manage DNS
+      echo "192.168.56.4	controllerinfra" | sudo tee -a /etc/hosts
+      echo "192.168.56.5	workerdev" | sudo tee -a /etc/hosts
+      echo "192.168.56.6	workerquality" | sudo tee -a /etc/hosts
+      echo "192.168.56.7	workerartifact" | sudo tee -a /etc/hosts
+      echo "192.168.56.8	workerdeploy" | sudo tee -a /etc/hosts
+      echo "192.168.56.9	workermonitor" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers 
+
+    SHELL
+  end
+  #
+  #
+  #
+  #
+  #
+  # Worker Artifact Machine (Server 4, workerartifact, 192.168.56.7) configurations are here,
+  config.vm.define "workerartifact" do |workerartifact|
+    workerartifact.vm.hostname = "workerartifact"
+    workerartifact.vm.network "private_network", type: "static", ip: "192.168.56.7"
+    # workerartifact.vm.network "public_network", ip: "192.168.56.7", :name => 'enp0s8', :adapter => 2
+    workerartifact.vm.provider "virtualbox" do |vb|
+      vb.name = "workerartifact"
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+
+    workerartifact.vm.provision "shell", inline: <<-SHELL
+      # Register
+      subscription-manager unregister
+      subscription-manager refresh
+      subscription-manager clean
+      subscription-manager register --username user --password P@$$w0rd
+      subscription-manager status
+      insights-client --version
+      insights-client --register
+      rhc connect
+
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+
+      setenforce 0
+
+      # Install required softwares
+      subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      dnf install -y epel-release
+
+      yum clean all -y
+      yum check -y
+      yum check-update -y
+      yum update -y
+
+      dnf install htop -y
+      dnf install multitail -y 
+      dnf groupinstall "Development Tools" -y
+      yum install -y yum-utils
+
+      # Manage DNS
+      echo "192.168.56.4	controllerinfra" | sudo tee -a /etc/hosts
+      echo "192.168.56.5	workerdev" | sudo tee -a /etc/hosts
+      echo "192.168.56.6	workerquality" | sudo tee -a /etc/hosts
+      echo "192.168.56.7	workerartifact" | sudo tee -a /etc/hosts
+      echo "192.168.56.8	workerdeploy" | sudo tee -a /etc/hosts
+      echo "192.168.56.9	workermonitor" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers 
+
+    SHELL
+  end
+  #
+  #
+  #
+  #
+  #
+  # Worker Deployment Machine (Server 5, workerdeploy, 192.168.56.8) configurations are here,
+  config.vm.define "workerdeploy" do |workerdeploy|
+    workerdeploy.vm.hostname = "workerdeploy"
+    workerdeploy.vm.network "private_network", type: "static", ip: "192.168.56.8"
+    # workerdeploy.vm.network "public_network", ip: "192.168.56.8", :name => 'enp0s8', :adapter => 2
+    workerdeploy.vm.provider "virtualbox" do |vb|
+      vb.name = "workerdeploy"
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+
+    workerdeploy.vm.provision "shell", inline: <<-SHELL
+      # Register
+      subscription-manager unregister
+      subscription-manager refresh
+      subscription-manager clean
+      subscription-manager register --username user --password P@$$w0rd
+      subscription-manager status
+      insights-client --version
+      insights-client --register
+      rhc connect
+
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+
+      setenforce 0
+
+      # Install required softwares
+      subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      dnf install -y epel-release
+
+      yum clean all -y
+      yum check -y
+      yum check-update -y
+      yum update -y
+
+      dnf install htop -y
+      dnf install multitail -y 
+      dnf groupinstall "Development Tools" -y
+      yum install -y yum-utils
+
+      # Manage DNS
+      echo "192.168.56.4	controllerinfra" | sudo tee -a /etc/hosts
+      echo "192.168.56.5	workerdev" | sudo tee -a /etc/hosts
+      echo "192.168.56.6	workerquality" | sudo tee -a /etc/hosts
+      echo "192.168.56.7	workerartifact" | sudo tee -a /etc/hosts
+      echo "192.168.56.8	workerdeploy" | sudo tee -a /etc/hosts
+      echo "192.168.56.9	workermonitor" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers
+
+    SHELL
+  end
+  #
+  #
+  #
+  #
+  #
+  # Worker Monitoring Machine (Server 6, workermonitor, 192.168.56.9) configurations are here,
+  config.vm.define "workermonitor" do |workermonitor|
+    workermonitor.vm.hostname = "workermonitor"
+    workermonitor.vm.network "private_network", type: "static", ip: "192.168.56.9"
+    # workermonitor.vm.network "public_network", ip: "192.168.56.9", :name => 'enp0s8', :adapter => 2
+    workermonitor.vm.provider "virtualbox" do |vb|
+      vb.name = "workermonitor"
+      vb.memory = 4096
+      vb.cpus = 2
+    end
+
+    workermonitor.vm.provision "shell", inline: <<-SHELL
+      # Register
+      subscription-manager unregister
+      subscription-manager refresh
+      subscription-manager clean
+      subscription-manager register --username user --password P@$$w0rd
+      subscription-manager status
+      insights-client --version
+      insights-client --register
+      rhc connect
+
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+
+      setenforce 0
+
+      # Install required softwares
+      subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      dnf install -y epel-release
+
+      yum clean all -y
+      yum check -y
+      yum check-update -y
+      yum update -y
+
+      dnf install htop -y
+      dnf install multitail -y 
+      dnf groupinstall "Development Tools" -y
+      yum install -y yum-utils
+
+      # Manage DNS
+      echo "192.168.56.4	controllerinfra" | sudo tee -a /etc/hosts
+      echo "192.168.56.5	workerdev" | sudo tee -a /etc/hosts
+      echo "192.168.56.6	workerquality" | sudo tee -a /etc/hosts
+      echo "192.168.56.7	workerartifact" | sudo tee -a /etc/hosts
+      echo "192.168.56.8	workerdeploy" | sudo tee -a /etc/hosts
+      echo "192.168.56.9	workermonitor" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers
+      
+    SHELL
+  end
+  #
+  #
+  #
+  #
+  #
+  # Controller Machine (Server 1, controllerinfra, 192.168.56.4) configurations are here,
+  config.vm.define "controllerinfra" do |controllerinfra|
+    controllerinfra.vm.hostname = "controllerinfra"
+    controllerinfra.vm.network "private_network", type: "static", ip: "192.168.56.4"
+    # controllerinfra.vm.network "public_network", ip: "192.168.56.4", :name => 'enp0s8', :adapter => 2
+    controllerinfra.vm.provider "virtualbox" do |vb|
+      vb.name = "controllerinfra"
+      vb.memory = 8192
+      vb.cpus = 2
+    end
+
+    controllerinfra.vm.provision "shell", inline: <<-SHELL
+      # Register
+      subscription-manager unregister
+      subscription-manager refresh
+      subscription-manager clean
+      subscription-manager register --username user --password P@$$w0rd
+      subscription-manager status
+      insights-client --version
+      insights-client --register
+      rhc connect
+
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+
+      setenforce 0
+
+      # Install required softwares
+      subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      dnf install -y  https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      dnf install -y epel-release
+
+      yum clean all -y
+      yum check -y
+      yum check-update -y
+      yum update -y
+
+      dnf install htop -y
+      dnf install multitail -y 
+      dnf groupinstall "Development Tools" -y
+      yum install -y yum-utils
+
+      # Manage DNS
+      echo "192.168.56.4	controllerinfra" | sudo tee -a /etc/hosts
+      echo "192.168.56.5	workerdev" | sudo tee -a /etc/hosts
+      echo "192.168.56.6	workerquality" | sudo tee -a /etc/hosts
+      echo "192.168.56.7	workerartifact" | sudo tee -a /etc/hosts
+      echo "192.168.56.8	workerdeploy" | sudo tee -a /etc/hosts
+      echo "192.168.56.9	workermonitor" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers
+
+      # Install Ansible
+      sudo dnf install -y ansible
+
+      # Authentication
+      ssh-keygen -t rsa -b 4096
+
+      ssh -o "StrictHostKeyChecking=no" root@192.168.56.4 exit
+      ssh -o "StrictHostKeyChecking=no" root@192.168.56.5 exit
+      ssh -o "StrictHostKeyChecking=no" root@192.168.56.6 exit
+      ssh -o "StrictHostKeyChecking=no" root@192.168.56.7 exit
+      ssh -o "StrictHostKeyChecking=no" root@192.168.56.8 exit
+      ssh -o "StrictHostKeyChecking=no" root@192.168.56.9 exit
+
+      ssh-copy-id root@192.168.56.4
+      ssh-copy-id root@192.168.56.5
+      ssh-copy-id root@192.168.56.6
+      ssh-copy-id root@192.168.56.7
+      ssh-copy-id root@192.168.56.8
+      ssh-copy-id root@192.168.56.9
+
+      # Write the Ansible inventory content to /etc/ansible/hosts
+      sudo tee /etc/ansible/hosts > /dev/null <<EOF
+
+[controllerinfra]
+192.168.56.4  ansible_user=root
+
+[workerdev]
+192.168.56.5  ansible_user=root
+
+[workerquality]
+192.168.56.6  ansible_user=root
+
+[workerartifact]
+192.168.56.7  ansible_user=root
+
+[workerdeploy]
+192.168.56.8  ansible_user=root
+
+[workermonitor]
+192.168.56.9  ansible_user=root
+EOF
+
+    SHELL
+  end
+
+end
