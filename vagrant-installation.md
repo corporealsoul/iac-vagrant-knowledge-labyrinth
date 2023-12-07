@@ -2,6 +2,12 @@
 
 **Download and install,** https://www.vagrantup.com/
 
+`PS D:\Server Snaps\The Architect> vagrant plugin install vagrant-vbguest`
+
+`PS D:\Server Snaps\The Architect> vagrant vbguest --status`
+
+<br>
+
 `PS D:\Server Snaps\Vagrant Project> vagrant --version`
 
 `PS D:\Server Snaps\Vagrant Project> vagrant status`
@@ -66,6 +72,9 @@
 
 `PS D:\Server Snaps\Vagrant Project\ubuntu-focal-64> vagrant destroy`
 
+`PS D:\Server Snaps\The Architect> vagrant vbguest --auto-reboot`
+
+`PS D:\Server Snaps\The Architect> vagrant reload --provision`
 
 ### Snapshot,
 
