@@ -1,5 +1,35 @@
 ### Vagrant custom box (Red Hat) ,
 
+**Prerequsites,**
+
+`[anup@localhost ~]$ sestatus -v`
+
+`[anup@localhost ~]$ sudo setenforce Enforcing`
+
+`[anup@localhost ~]$ sudo restorecon -Rv /etc/selinux`
+
+`[anup@localhost ~]$ sudo systemctl stop firewalld.service`
+
+`[anup@localhost ~]$ sudo yum update kernel`
+
+`[anup@localhost ~]$ sudo yum install -y kernel-devel`
+
+`[anup@localhost ~]$ sudo dnf groupinstall "Development Tools" -y`
+
+`[anup@localhost ~]$ sudo init 6`
+
+`[anup@localhost ~]$ sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms`
+
+`[anup@localhost ~]$ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -y`
+
+`[anup@localhost ~]$ sudo yum update`
+
+`[anup@localhost ~]$ sudo yum search dkms -y`
+
+`[anup@localhost ~]$ sudo yum install dkms -y`
+
+
+
 **Create Red Hat box,**
 
 `PS C:\Users\uniqs> cd 'D:\Server Snaps\Vagrant Project\'`
