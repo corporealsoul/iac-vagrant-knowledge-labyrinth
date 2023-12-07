@@ -6,6 +6,21 @@
 
 `PS D:\Server Snaps\Vagrant Project> vagrant status`
 
+### Plugins,
+
+`PS D:\Server Snaps\Vagrant Project> vagrant plugin list`
+
+`PS D:\Server Snaps\Vagrant Project> vagrant plugin install vagrant-vbguest`
+
+`PS D:\Server Snaps\Vagrant Project> vagrant plugin list`
+
+`PS D:\Server Snaps\Vagrant Project> vagrant vbguest --status`
+
+`PS D:\Server Snaps\Vagrant Project> vagrant plugin update `
+
+`PS D:\Server Snaps\Vagrant Project> vagrant plugin update vagrant-vbguest`
+
+`PS D:\Server Snaps\Vagrant Project> vagrant plugin uninstall vagrant-vbguest`
 
 ### Vagrant box,
 
@@ -71,22 +86,5 @@ https://developer.hashicorp.com/vagrant/docs/cli/snapshot
 `PS D:\Server Snaps\The Architect> vagrant snapshot restore '26 July 2023 23:18:47'`
 
 `PS D:\Server Snaps\The Architect> vagrant snapshot delete '26 July 2023 23:18:47'`
-
-
-### Plugins,
-
-`PS D:\Server Snaps\Vagrant Project> vagrant plugin list`
-
-`PS D:\Server Snaps\Vagrant Project> vagrant plugin install vagrant-vbguest`
-
-`PS D:\Server Snaps\Vagrant Project> vagrant plugin list`
-
-`PS D:\Server Snaps\Vagrant Project> vagrant vbguest --status`
-
-`PS D:\Server Snaps\Vagrant Project> vagrant plugin update `
-
-`PS D:\Server Snaps\Vagrant Project> vagrant plugin update vagrant-vbguest`
-
-`PS D:\Server Snaps\Vagrant Project> vagrant plugin uninstall vagrant-vbguest`
 
 <br>
