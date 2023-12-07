@@ -22,6 +22,7 @@
 
 `[anup@localhost ~]$ tail /var/log/vboxadd-setup.log`
 
+<br>
 
 **Mount the VirtualBox Guest Additions ISO:** mount /dev/cdrom /mnt
 
