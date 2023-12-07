@@ -28,6 +28,8 @@
 
 `[anup@localhost ~]$ sudo yum install dkms -y`
 
+`[root@localhost ~]# ssh-keygen -t rsa -b 2048`
+
 
 
 **Create Red Hat box,**
