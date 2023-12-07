@@ -14,6 +14,8 @@
 
 `anup@ubuntu-22point04point3-untouched:~$ sudo apt-get install libxmu6`
 
+`root@ubuntu-22point04point3-untouched:~# ssh-keygen -t rsa -b 2048`
+
 
 **Create Ubuntu box,**
 
