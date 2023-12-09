@@ -1,4 +1,29 @@
 # Global configurations are here,
+# Vagrant.configure("2") do |config|
+
+#   machines = ["server1", "server2"]
+
+#   machines.each_with_index do |machine, index|
+#     config.vm.define machine do |virtualmachine|
+#       virtualmachine.vm.box = "almalinux/9"
+#       virtualmachine.vm.hostname = machine
+#       virtualmachine.vm.network "forwarded_port", guest: 22, host: 2222 + index, id: "ssh"
+#       virtualmachine.vm.network "private_network", type: "static", ip: "192.168.56.#{index + 4}"
+#       virtualmachine.vm.provider "virtualbox" do |virtualbox|
+#         virtualbox.name = machine
+#         virtualbox.memory = 4096
+#         virtualbox.cpus = 2
+#       end
+#       vm.vm.provision "shell", inline: <<-SHELL
+#         # Your provisioning script here
+#       SHELL
+#     end
+#   end
+# end
+
+
+
+# Global configurations are here,
 Vagrant.configure("2") do |config|
 
   machines = ["workerdev", "workerquality"]
