@@ -59,6 +59,18 @@
 
 `PS D:\Server Snaps\Vagrant Project\ubuntu-focal-64> vagrant box update`
 
+### A Small Machine,
+
+    # Vagrantfile
+    Vagrant.configure("2") do |config|
+      config.vm.box = "almalinux/9" # Replace with the actual box name
+      config.vm.network "forwarded_port", guest: 22, host: 2222, id: "ssh"
+      config.vm.network "public_network", ip: "192.168.56.5", :name => 'enp0s8', :adapter => 2
+      config.vm.provider "virtualbox" do |vb|
+        vb.memory = "2048" # Adjust the memory size as needed
+        vb.cpus = 1        # Adjust the number of CPUs as needed
+      end
+    end
 
 ### Vagrant ssh, halt, destroy
 
