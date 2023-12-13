@@ -1,0 +1,94 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "rhel-92-vagrantbox"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 2
+  end
+
+  config.ssh.username = "root"
+  config.ssh.password = " "
+  config.ssh.insert_key = false
+  config.ssh.forward_agent = true
+
+  # Worker Development Machine
+  config.vm.define "development" do |development|
+    development.vm.hostname = "development"
+    development.vm.network "public_network", ip: "192.168.56.11", bridge: "enp0s8", adapter: 2
+    development.vm.provider "virtualbox" do |vb|
+      vb.name = "development"
+    end
+    development.vm.provision "shell", inline: <<-SHELL
+      # Manage DNS
+      echo "192.168.56.10	controller" | sudo tee -a /etc/hosts
+      echo "192.168.56.11	development" | sudo tee -a /etc/hosts
+
+      # Authentication
+      sudo yum install -y openssh-server
+      sudo systemctl start sshd
+      sudo systemctl enable sshd
+
+      sudo ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+
+    SHELL
+  end
+
+  # Controller
+  config.vm.define "controller" do |controller|
+    controller.vm.hostname = "controller"
+    controller.vm.network "public_network", ip: "192.168.56.10", bridge: "enp0s8", adapter: 2
+    controller.vm.provider "virtualbox" do |vb|
+      vb.name = "controller"
+    end
+    controller.vm.provision "shell", inline: <<-SHELL
+      # Disable firewall and SELinux
+      sudo systemctl stop firewalld.service
+      sudo systemctl disable firewalld.service
+      setenforce 0
+
+      # Manage DNS
+      echo "192.168.56.10	controller" | sudo tee -a /etc/hosts
+      echo "192.168.56.11	development" | sudo tee -a /etc/hosts
+
+      # Create a new user
+      sudo useradd -m -s /bin/bash anup
+      echo 'anup: ' | sudo chpasswd
+      sudo usermod -aG wheel anup
+
+      # visudo
+      echo "anup ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers
+
+      # Install Ansible
+      sudo dnf install -y ansible
+
+      # Authentication
+      sudo yum install -y openssh-server
+      sudo systemctl start sshd
+      sudo systemctl enable sshd
+
+      sudo ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+
+      sudo chmod 600 ~/.ssh/id_rsa
+      sudo chmod 644 ~/.ssh/id_rsa.pub
+
+      sudo ssh -o "StrictHostKeyChecking=no" root@192.168.56.10 exit
+      sudo ssh -o "StrictHostKeyChecking=no" root@192.168.56.11 exit
+
+      # sudo ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.56.10
+      sudo sshpass -p ' ' ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.56.10
+
+      # sudo ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.56.11
+      sudo sshpass -p ' ' ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.56.11
+
+
+      # Write the Ansible inventory content to /etc/ansible/hosts
+      sudo tee /etc/ansible/hosts > /dev/null <<EOF
+[controller]
+192.168.56.10  ansible_user=root
+
+[development]
+192.168.56.11  ansible_user=root
+EOF
+    SHELL
+  end
+end
